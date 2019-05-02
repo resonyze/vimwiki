@@ -428,6 +428,24 @@ function! s:tag_weblink(value)
   return line
 endfunction
 
+" To move images and modify their link according to resonyze.xyz
+function! s:resonyze_imglink(url)
+  let url = a:url
+  let url = split(url_0, ':')[1]
+
+  let wikifilepath = fnamemodify(s:current_wiki_file, ":p:h")
+  let url = wikifilepath . "/" . url
+
+  " this code just creates a directory in the html folder
+  let dir = fnamemodify(url, ':p:h')
+  let dir = "/home/vector/website/html" . split(dir, '/home/vector/website')[0]
+  call system("if [[ -d " . dir . " ]]; then :; else mkdir " . dir . "; fi")
+  call system("cp " . url . " " . dir)
+
+  " this is to set the path for my nginx server
+  let url = split(url, '/home/vector/website')[0]
+  return url
+endfunction
 
 function! s:tag_wikiincl(value)
   " {{imgurl|arg1|arg2}}    -> ???
@@ -456,10 +474,26 @@ function! s:tag_wikiincl(value)
       let url = link_infos.filename
     endif
 
+    " remove this line and above function to remove my mod.
+    let url = s:resonyze_imglink(url)
+
     let url = escape(url, '#')
     let line = s:linkify_image(url, descr, verbatim_str)
   endif
   return line
+endfunction
+
+" Copy files in res folder and make link absolute for nginx to work
+function! s:resonyze_reslink(html_link)
+  let html_link = a:html_link
+  let dir = fnamemodify(html_link, ':p:h')
+  let dir = "/home/vector/website/html" . split(dir, '/home/vector/website')[0]
+  echom "Directory to be created: " . dir
+  call system("if [[ -d " . dir . " ]]; then :; else mkdir " . dir . "; fi")
+  call system("cp " . html_link . " " . dir)
+  let html_link = split(html_link, '/home/vector/website')[0]
+
+  return html_link
 endfunction
 
 
@@ -484,6 +518,10 @@ function! s:tag_wikilink(value)
     if link_infos.scheme ==# 'file'
       " external file links are always absolute
       let html_link = link_infos.filename
+
+      " Remove this line and preceding function to remove my mods
+      let html_link = s:resonyze_reslink(html_link)
+
     elseif link_infos.scheme ==# 'local'
       let html_link = vimwiki#path#relpath(fnamemodify(s:current_html_file, ':h'),
             \ link_infos.filename)
