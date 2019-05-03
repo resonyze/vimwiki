@@ -429,8 +429,8 @@ function! s:tag_weblink(value)
 endfunction
 
 " To move images and modify their link according to resonyze.xyz
-function! s:resonyze_imglink(url)
-  let url = a:url
+function! s:resonyze_imglink(url_0)
+  let url_0 = a:url_0
   let url = split(url_0, ':')[1]
 
   let wikifilepath = fnamemodify(s:current_wiki_file, ":p:h")
@@ -475,7 +475,7 @@ function! s:tag_wikiincl(value)
     endif
 
     " remove this line and above function to remove my mod.
-    let url = s:resonyze_imglink(url)
+    let url = s:resonyze_imglink(url_0)
 
     let url = escape(url, '#')
     let line = s:linkify_image(url, descr, verbatim_str)
