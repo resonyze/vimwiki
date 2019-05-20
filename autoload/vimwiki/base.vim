@@ -117,8 +117,9 @@ function! vimwiki#base#resolve_link(link_text, ...)
     let source_file = vimwiki#path#current_wiki_file()
   endif
 
-  let link_text = a:link_text
-
+  " get rid of '\' in escaped characters in []() style markdown links
+  " other style links don't allow '\'
+  let link_text = substitute(a:link_text, '\(\\\)\(\W\)\@=', '', 'g')
 
   let link_infos = {
         \ 'index': -1,
@@ -440,6 +441,7 @@ function! vimwiki#base#backlinks()
         if vimwiki#u#is_windows()
           " TODO this is a temporary fix - see issue #478
           let target_file = substitute(target_file, '/', '\', 'g')
+          let current_filename = substitute(current_filename, '/', '\', 'g')
         endif
         " don't include links from the current file to itself
         if vimwiki#path#is_equal(target_file, current_filename) &&
