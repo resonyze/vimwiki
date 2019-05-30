@@ -431,19 +431,31 @@ endfunction
 " To move images and modify their link according to resonyze.xyz
 function! s:resonyze_imglink(url_0)
   let url_0 = a:url_0
+  " file:img/something.png -> img/something.png
   let url = split(url_0, ':')[1]
 
+  " get the full path to subdir of the current wikifile 
   let wikifilepath = fnamemodify(s:current_wiki_file, ":p:h")
+  " full path to the external resource file
   let url = wikifilepath . "/" . url
 
   " this code just creates a directory in the html folder
   let dir = fnamemodify(url, ':p:h')
-  let dir = "/home/vector/website/html" . split(dir, '/home/vector/website')[0]
+
+  let html_path = vimwiki#vars#get_wikilocal('path_html')
+  let wiki_path = vimwiki#vars#get_wikilocal('path')
+
+  "echom "COMPARE THESE TWO"
+  "echom html_path . split(dir, wiki_path)[0]
+  "echom "/home/vector/website/html" . split(dir, '/home/vector')[0]
+  "let dir = "/home/vector/website/html" . split(dir, '/home/vector')[0]
+  let dir = html_path . split(dir, wiki_path)[0]
   call system("if [[ -d " . dir . " ]]; then :; else mkdir " . dir . "; fi")
+  echom "Copying " . url . " to " . dir
   call system("cp " . url . " " . dir)
 
   " this is to set the path for my nginx server
-  let url = split(url, '/home/vector/website')[0]
+  let url = "/". split(url, wiki_path)[0]
   return url
 endfunction
 
@@ -486,12 +498,27 @@ endfunction
 " Copy files in res folder and make link absolute for nginx to work
 function! s:resonyze_reslink(html_link)
   let html_link = a:html_link
+  echom "html_link is" . html_link
+  let html_link = a:html_link
   let dir = fnamemodify(html_link, ':p:h')
-  let dir = "/home/vector/website/html" . split(dir, '/home/vector/website')[0]
+
+  let html_path = vimwiki#vars#get_wikilocal('path_html')
+  let wiki_path = vimwiki#vars#get_wikilocal('path')
+
+  "let dir = "/home/vector/website/html" . split(dir, '/home/vector')[0]
+  let dir = html_path . split(dir, wiki_path)[0]
   echom "Directory to be created: " . dir
   call system("if [[ -d " . dir . " ]]; then :; else mkdir " . dir . "; fi")
+
+  " html_link stores the full path to the file to be copied
   call system("cp " . html_link . " " . dir)
-  let html_link = split(html_link, '/home/vector/website')[0]
+
+  " path of the newly copied file (in html folder)
+  let copied_path = dir . '/' . fnamemodify(html_link, ':p:t')
+  " resonyze.xyz root folder
+  let website_root = "/home/vector/website/html"
+
+  let html_link = split(copied_path, website_root)[0]
 
   return html_link
 endfunction
