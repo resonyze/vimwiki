@@ -546,6 +546,7 @@ function! s:tag_wikilink(value)
   let line = VimwikiLinkConverter(url, s:current_wiki_file, s:current_html_file)
   if line == ''
     let link_infos = vimwiki#base#resolve_link(url, s:current_wiki_file)
+    echom "link_infos " . string(link_infos.scheme)
 
     if link_infos.scheme ==# 'file'
       " external file links are always absolute
@@ -554,6 +555,10 @@ function! s:tag_wikilink(value)
       " Remove this line and preceding function to remove my mods
       let html_link = s:resonyze_reslink(html_link)
 
+    " Pushing vfiles too.
+    elseif link_infos.scheme ==# 'vfile'
+      let html_link = link_infos.filename
+      let html_link = s:resonyze_reslink(html_link)
     elseif link_infos.scheme ==# 'local'
       let html_link = vimwiki#path#relpath(fnamemodify(s:current_html_file, ':h'),
             \ link_infos.filename)

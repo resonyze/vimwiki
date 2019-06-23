@@ -38,7 +38,7 @@ function! s:populate_global_variables()
   " Scheme regexes must be defined even if syntax file is not loaded yet cause users should be
   " able to <leader>w<leader>w without opening any vimwiki file first
   let g:vimwiki_global_vars.schemes = join(['wiki\d\+', 'diary', 'local'], '\|')
-  let g:vimwiki_global_vars.web_schemes1 = join(['http', 'https', 'file', 'ftp', 'gopher',
+  let g:vimwiki_global_vars.web_schemes1 = join(['http', 'https', 'file', 'vfile', 'ftp', 'gopher',
         \ 'telnet', 'nntp', 'ldap', 'rsync', 'imap', 'pop', 'irc', 'ircs', 'cvs', 'svn', 'svn+ssh',
         \ 'git', 'ssh', 'fish', 'sftp'], '\|')
   let web_schemes2 =
