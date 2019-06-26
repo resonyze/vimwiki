@@ -1348,7 +1348,8 @@ function! vimwiki#base#go_back_link()
     call setpos('.', prev_link[1])
   else
     " maybe we came here by jumping to a tag -> pop from the tag stack
-    silent! pop!
+    " silent! pop!
+    call vimwiki#base#edit_file(':e ', 'index.wiki', '')
   endif
 endfunction
 
